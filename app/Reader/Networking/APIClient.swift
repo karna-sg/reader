@@ -89,4 +89,48 @@ struct APIClient {
         let body = try JSONSerialization.data(withJSONObject: ["name": name])
         _ = try await URLSession.shared.data(for: try request("/labels", method: "POST", body: body))
     }
+
+    // ── settings ──────────────────────────────────────────────────────────
+    func settings() async throws -> ServerSettingsDTO {
+        try await run(request("/settings"), as: ServerSettingsDTO.self)
+    }
+
+    @discardableResult
+    func saveSettings(_ patch: [String: Any]) async throws -> ServerSettingsDTO {
+        let body = try JSONSerialization.data(withJSONObject: patch)
+        return try await run(request("/settings", method: "POST", body: body), as: ServerSettingsDTO.self)
+    }
+
+    // ── source management ─────────────────────────────────────────────────
+    func sources() async throws -> [SourceStatusDTO] {
+        try await run(request("/sources"), as: SourcesResponse.self).sources
+    }
+
+    func toggleSource(id: String, enabled: Bool) async throws {
+        let body = try JSONSerialization.data(withJSONObject: ["enabled": enabled])
+        _ = try await URLSession.shared.data(for: try request("/sources/\(id)/toggle", method: "POST", body: body))
+    }
+
+    func deleteSource(id: String) async throws {
+        _ = try await URLSession.shared.data(for: try request("/sources/\(id)", method: "DELETE"))
+    }
+
+    func addSource(kind: String, title: String, config: [String: Any],
+                   fullText: String, labelIds: [String]) async throws {
+        let payload: [String: Any] = [
+            "kind": kind, "title": title, "config": config,
+            "full_text": fullText, "label_ids": labelIds,
+        ]
+        let body = try JSONSerialization.data(withJSONObject: payload)
+        _ = try await URLSession.shared.data(for: try request("/sources", method: "POST", body: body))
+    }
+
+    // ── admin triggers ────────────────────────────────────────────────────
+    func triggerPoll() async throws {
+        _ = try await URLSession.shared.data(for: try request("/admin/poll", method: "POST", body: Data("{}".utf8)))
+    }
+
+    func triggerTag() async throws {
+        _ = try await URLSession.shared.data(for: try request("/admin/tag", method: "POST", body: Data("{}".utf8)))
+    }
 }

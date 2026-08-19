@@ -18,6 +18,10 @@ enum ScreenshotHarness {
                 NavigationStack {
                     ReaderHarnessView(itemId: itemId)
                 }
+            case .settings:
+                SettingsView()
+            case .sources:
+                NavigationStack { SourcesView() }
             }
         } else {
             RootView()
@@ -27,6 +31,8 @@ enum ScreenshotHarness {
     private enum Target {
         case feed(String, String)
         case reader(String)
+        case settings
+        case sources
     }
 
     private static func parse() -> Target? {
@@ -40,6 +46,8 @@ enum ScreenshotHarness {
         if spec.hasPrefix("reader:") {
             return .reader(String(spec.dropFirst("reader:".count)))
         }
+        if spec == "settings" { return .settings }
+        if spec == "sources" { return .sources }
         return nil
     }
 

@@ -20,9 +20,18 @@ import {
   searchItems,
   setItemState,
 } from "../store/items.js";
-import { upsertSource } from "../store/sources.js";
+import {
+  deleteSource,
+  listSourcesWithStatus,
+  setSourceEnabled,
+  upsertSource,
+} from "../store/sources.js";
 import { syncDelta } from "../store/sync.js";
 import { parseOpmlToSpecs } from "../adapters/opml.js";
+import { applySettingsPatch, effectiveConfig, publicSettings } from "../config/settings.js";
+import { buildAdapterContext } from "../pipeline/context.js";
+import { pollAll, tagIfEnabled } from "../scheduler/scheduler.js";
+import { clearRedditTokenCache } from "../adapters/reddit.js";
 import { feedItemDto, itemDetailDto, searchItemDto } from "./dto.js";
 import { slugify } from "../util/slug.js";
 import { log } from "../logging/logger.js";
@@ -32,15 +41,26 @@ const KINDS: SourceKind[] = ["rss", "hackernews", "reddit", "youtube", "arxiv", 
 export function buildApp(db: Db, cfg: Config): Hono {
   const app = new Hono();
 
-  // ── auth ──────────────────────────────────────────────────────────────────
+  // ── auth (public: "/" and "/health"; everything else needs the token) ──────
+  const PUBLIC_PATHS = new Set(["/", "/health"]);
   app.use("*", async (c, next) => {
-    if (c.req.path === "/health") return next();
+    if (PUBLIC_PATHS.has(c.req.path)) return next();
     if (!cfg.READER_TOKEN) return next(); // dev mode: no token configured
     const header = c.req.header("authorization") ?? "";
     const token = header.startsWith("Bearer ") ? header.slice(7) : "";
     if (token !== cfg.READER_TOKEN) return c.json({ error: "unauthorized" }, 401);
     return next();
   });
+
+  // Friendly root so hitting the URL in a browser doesn't look broken.
+  app.get("/", (c) =>
+    c.json({
+      service: "reader",
+      ok: true,
+      note: "Token-protected API. Open the Reader app → Settings, set this URL as the Base URL and paste your READER_TOKEN.",
+      health: "/health",
+    }),
+  );
 
   app.get("/health", (c) => {
     const sources = (db.raw.prepare("SELECT COUNT(*) AS n FROM sources").get() as { n: number }).n;
@@ -185,6 +205,60 @@ export function buildApp(db: Db, cfg: Config): Hono {
     const specs = parseOpmlToSpecs(xml);
     for (const s of specs) upsertSource(db, s, cfg.DEFAULT_POLL_INTERVAL_MS);
     return c.json({ imported: specs.length, source_ids: specs.map((s) => s.id) }, 201);
+  });
+
+  // ── settings (runtime config; secrets write-only) ─────────────────────────
+  app.get("/settings", (c) => c.json(publicSettings(db, cfg)));
+
+  app.post("/settings", async (c) => {
+    const patch = z
+      .object({
+        reddit_client_id: z.string().optional(),
+        reddit_client_secret: z.string().optional(),
+        reddit_user_agent: z.string().optional(),
+        anthropic_api_key: z.string().optional(),
+        tag_model: z.string().optional(),
+        tag_llm_enabled: z.boolean().optional(),
+        http_user_agent: z.string().optional(),
+        default_poll_interval_ms: z.number().int().positive().optional(),
+      })
+      .parse(await c.req.json());
+    applySettingsPatch(db, patch);
+    // If Reddit creds changed, drop any cached OAuth token so the new ones apply.
+    if (patch.reddit_client_id !== undefined || patch.reddit_client_secret !== undefined) {
+      clearRedditTokenCache();
+    }
+    return c.json(publicSettings(db, cfg));
+  });
+
+  // ── source management ─────────────────────────────────────────────────────
+  app.get("/sources", (c) => c.json({ sources: listSourcesWithStatus(db) }));
+
+  app.post("/sources/:id/toggle", async (c) => {
+    const body = z.object({ enabled: z.boolean() }).parse(await c.req.json());
+    const ok = setSourceEnabled(db, c.req.param("id"), body.enabled);
+    return ok ? c.json({ ok: true }) : c.json({ error: "not found" }, 404);
+  });
+
+  app.delete("/sources/:id", (c) => {
+    const ok = deleteSource(db, c.req.param("id"));
+    return ok ? c.json({ ok: true }) : c.json({ error: "not found" }, 404);
+  });
+
+  // ── admin triggers (fire-and-forget; return immediately) ──────────────────
+  app.post("/admin/poll", (c) => {
+    const ctx = buildAdapterContext(effectiveConfig(db, cfg));
+    void pollAll(db, ctx)
+      .then((s) => log("admin").info("manual poll complete", s))
+      .catch((e) => log("admin").warn("manual poll failed", { err: (e as Error).message }));
+    return c.json({ started: true });
+  });
+
+  app.post("/admin/tag", (c) => {
+    void tagIfEnabled(db, cfg)
+      .then((t) => t && log("admin").info("manual tag complete", t))
+      .catch((e) => log("admin").warn("manual tag failed", { err: (e as Error).message }));
+    return c.json({ started: true });
   });
 
   app.onError((err, c) => {

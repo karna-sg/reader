@@ -3,7 +3,8 @@
 import { readFile } from "node:fs/promises";
 import { serve } from "@hono/node-server";
 import { Command } from "commander";
-import { getConfig, llmTaggingReady } from "./config/env.js";
+import { getConfig } from "./config/env.js";
+import { effectiveConfig, llmReady } from "./config/settings.js";
 import { initLogger, log } from "./logging/logger.js";
 import { openDb } from "./db/db.js";
 import "./adapters/registry.js"; // registers adapters
@@ -30,8 +31,7 @@ program
     if (!cfg.READER_TOKEN) {
       logger.warn("READER_TOKEN is not set — the API is UNAUTHENTICATED (dev mode only).");
     }
-    const ctx = buildAdapterContext(cfg);
-    const scheduler = startScheduler(db, ctx, cfg);
+    const scheduler = startScheduler(db, cfg);
     const app = buildApp(db, cfg);
     const server = serve({ fetch: app.fetch, port: cfg.PORT });
     logger.info(`Reader API listening on http://localhost:${cfg.PORT} (${countSources(db)} sources)`);
@@ -54,7 +54,7 @@ program
     const cfg = getConfig();
     initLogger(cfg.LOG_LEVEL);
     const db = openDb(cfg.DB_PATH);
-    const ctx = buildAdapterContext(cfg);
+    const ctx = buildAdapterContext(effectiveConfig(db, cfg));
     const summary = opts.all ? await pollAll(db, ctx) : await pollDue(db, ctx);
     log("poll").info("poll complete", summary);
     db.close();
@@ -67,12 +67,14 @@ program
   .action(async (opts: { limit: string }) => {
     const cfg = getConfig();
     initLogger(cfg.LOG_LEVEL);
-    if (!llmTaggingReady(cfg)) {
-      log("tag").warn("LLM tagging not enabled — set ANTHROPIC_API_KEY and TAG_LLM_ENABLED=true");
+    const db = openDb(cfg.DB_PATH);
+    const eff = effectiveConfig(db, cfg);
+    if (!llmReady(eff)) {
+      log("tag").warn("LLM tagging not enabled — set the Anthropic key + enable tagging (app Settings or .env)");
+      db.close();
       return;
     }
-    const db = openDb(cfg.DB_PATH);
-    const tagger = makeAnthropicTagger(cfg);
+    const tagger = makeAnthropicTagger({ apiKey: eff.anthropicApiKey!, model: eff.tagModel });
     const result = await tagPending(db, tagger, { limit: Number(opts.limit) || 100 });
     log("tag").info("tagging complete", result);
     db.close();

@@ -89,6 +89,48 @@ export function countSources(db: Db): number {
   return r.n;
 }
 
+export interface SourceStatus {
+  id: string;
+  kind: string;
+  title: string;
+  enabled: boolean;
+  full_text: string;
+  authority: number;
+  last_status: string | null;
+  last_fetched_at: number | null;
+  item_count: number;
+  label_ids: string[];
+}
+
+export function listSourcesWithStatus(db: Db): SourceStatus[] {
+  const rows = db.raw
+    .prepare(
+      `SELECT s.id, s.kind, s.title, s.enabled, s.full_text, s.authority, s.last_status, s.last_fetched_at,
+              (SELECT COUNT(*) FROM items i WHERE i.source_id = s.id AND i.deleted_at IS NULL) AS item_count
+       FROM sources s ORDER BY s.kind, s.title`,
+    )
+    .all() as unknown as (Omit<SourceStatus, "enabled" | "label_ids"> & { enabled: number })[];
+  const labelStmt = db.raw.prepare("SELECT label_id FROM source_labels WHERE source_id = ?");
+  return rows.map((r) => ({
+    ...r,
+    enabled: r.enabled === 1,
+    label_ids: (labelStmt.all(r.id) as { label_id: string }[]).map((x) => x.label_id),
+  }));
+}
+
+export function deleteSource(db: Db, id: string): boolean {
+  // FK ON DELETE CASCADE removes items / item_labels / source_labels.
+  const info = db.raw.prepare("DELETE FROM sources WHERE id = ?").run(id);
+  return Number(info.changes) > 0;
+}
+
+export function setSourceEnabled(db: Db, id: string, enabled: boolean): boolean {
+  const info = db.raw
+    .prepare("UPDATE sources SET enabled = ?, updated_at = ? WHERE id = ?")
+    .run(enabled ? 1 : 0, Date.now(), id);
+  return Number(info.changes) > 0;
+}
+
 export interface FetchStateUpdate {
   etag: string | null;
   lastModified: string | null;

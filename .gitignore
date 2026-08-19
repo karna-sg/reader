@@ -19,3 +19,7 @@ xcuserdata/
 *.xcuserstate
 build/
 DerivedData/
+
+# build artifacts (regenerable — not tracked)
+app/build_device/
+*.ipa

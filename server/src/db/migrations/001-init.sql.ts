@@ -11,6 +11,13 @@ CREATE TABLE IF NOT EXISTS meta (
 );
 INSERT OR IGNORE INTO meta(key, value) VALUES ('row_version', 0);
 
+-- Runtime-overridable configuration set from the app (overrides env at runtime,
+-- applied live without a restart). Secrets are write-only via the API.
+CREATE TABLE IF NOT EXISTS settings (
+  key   TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS sources (
   id               TEXT PRIMARY KEY,
   kind             TEXT NOT NULL,

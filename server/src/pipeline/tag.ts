@@ -5,7 +5,6 @@
 // return valid JSON; the taxonomy block is marked cache_control for reuse.
 import Anthropic from "@anthropic-ai/sdk";
 import type { Db } from "../db/db.js";
-import type { Config } from "../config/env.js";
 import type { SourceKind } from "../model/item.js";
 import { DEFAULT_LABELS } from "../model/labels.js";
 import { assignItemLabels } from "../store/items.js";
@@ -86,13 +85,13 @@ export interface Tagger {
   classify(item: { title: string; source_title: string; body_text: string | null }): Promise<ClassifiedLabel[]>;
 }
 
-/** Build a live Haiku-backed tagger. */
-export function makeAnthropicTagger(cfg: Config): Tagger {
-  const client = new Anthropic({ apiKey: cfg.ANTHROPIC_API_KEY });
+/** Build a live Haiku-backed tagger from resolved credentials. */
+export function makeAnthropicTagger(opts: { apiKey: string; model: string }): Tagger {
+  const client = new Anthropic({ apiKey: opts.apiKey });
   return {
     async classify(item): Promise<ClassifiedLabel[]> {
       const response = await client.messages.create({
-        model: cfg.TAG_MODEL,
+        model: opts.model,
         max_tokens: 256,
         system: [{ type: "text", text: SYSTEM, cache_control: { type: "ephemeral" } }],
         output_config: { format: { type: "json_schema", schema: OUTPUT_SCHEMA } },

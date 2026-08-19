@@ -85,3 +85,30 @@ struct HealthResponse: Codable {
     let sources: Int
     let items: Int
 }
+
+struct ServerSettingsDTO: Codable {
+    let reddit_configured: Bool
+    let reddit_user_agent: String
+    let anthropic_configured: Bool
+    let tag_model: String
+    let tag_llm_enabled: Bool
+    let http_user_agent: String
+    let default_poll_interval_ms: Int
+}
+
+struct SourceStatusDTO: Codable, Identifiable, Hashable {
+    let id: String
+    let kind: String
+    let title: String
+    let enabled: Bool
+    let full_text: String
+    let authority: Double
+    let last_status: String?
+    let last_fetched_at: Int?
+    let item_count: Int
+    let label_ids: [String]
+}
+
+struct SourcesResponse: Codable {
+    let sources: [SourceStatusDTO]
+}

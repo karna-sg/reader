@@ -1,17 +1,17 @@
-// Build the shared AdapterContext (HTTP UAs, timeout, full-text extractor) from
-// config. `now` is refreshed per source run inside the ingest step.
-import type { Config } from "../config/env.js";
+// Build the shared AdapterContext from the effective (DB-overridable) config.
+// `now` is refreshed per source run inside the ingest step.
 import { makeExtractor } from "../adapters/extract.js";
 import type { AdapterContext } from "../adapters/types.js";
+import type { EffectiveConfig } from "../config/settings.js";
 
-export function buildAdapterContext(cfg: Config): AdapterContext {
-  const extract = makeExtractor({ userAgent: cfg.HTTP_USER_AGENT, timeoutMs: 20_000 });
+export function buildAdapterContext(eff: EffectiveConfig): AdapterContext {
+  const extract = makeExtractor({ userAgent: eff.httpUserAgent, timeoutMs: 20_000 });
   return {
-    httpUserAgent: cfg.HTTP_USER_AGENT,
-    redditUserAgent: cfg.REDDIT_USER_AGENT,
+    httpUserAgent: eff.httpUserAgent,
+    redditUserAgent: eff.redditUserAgent,
     timeoutMs: 20_000,
-    redditClientId: cfg.REDDIT_CLIENT_ID ?? null,
-    redditClientSecret: cfg.REDDIT_CLIENT_SECRET ?? null,
+    redditClientId: eff.redditClientId,
+    redditClientSecret: eff.redditClientSecret,
     redditBearer: null,
     extract,
     now: Date.now(),

@@ -1,14 +1,16 @@
 // Server-owned polling. iOS background refresh is best-effort (iOS 26 tightened
 // BGAppRefreshTask), so the server is the source of freshness. A croner job runs
 // each minute, processing due sources sequentially with a polite per-host gap
-// and 429 backoff (handled in ingest via deferSource).
+// and 429 backoff (handled in ingest via deferSource). Config (Reddit creds,
+// tagging, UAs) is read live from effectiveConfig each tick — no restart needed.
 import { Cron } from "croner";
 import type { Db } from "../db/db.js";
 import type { Config } from "../config/env.js";
-import { llmTaggingReady } from "../config/env.js";
+import { effectiveConfig, llmReady } from "../config/settings.js";
 import type { AdapterContext, Source } from "../adapters/types.js";
 import { listAllSources, listDueSources } from "../store/sources.js";
 import { runSource } from "../pipeline/ingest.js";
+import { buildAdapterContext } from "../pipeline/context.js";
 import { makeAnthropicTagger, tagPending } from "../pipeline/tag.js";
 import { log } from "../logging/logger.js";
 
@@ -39,11 +41,7 @@ export interface PollSummary {
   errors: number;
 }
 
-async function processList(
-  db: Db,
-  ctx: AdapterContext,
-  sources: Source[],
-): Promise<PollSummary> {
+async function processList(db: Db, ctx: AdapterContext, sources: Source[]): Promise<PollSummary> {
   const lastHostHit = new Map<string, number>();
   let created = 0;
   let errors = 0;
@@ -78,23 +76,30 @@ export async function pollAll(db: Db, ctx: AdapterContext): Promise<PollSummary>
   return processList(db, ctx, listAllSources(db));
 }
 
+/** Run the auto-tagging pass if it is configured in the effective config. */
+export async function tagIfEnabled(db: Db, envCfg: Config): Promise<{ tagged: number } | null> {
+  const eff = effectiveConfig(db, envCfg);
+  if (!llmReady(eff)) return null;
+  const tagger = makeAnthropicTagger({ apiKey: eff.anthropicApiKey!, model: eff.tagModel });
+  return tagPending(db, tagger, { limit: 200 });
+}
+
 export interface SchedulerHandle {
   stop(): void;
 }
 
-export function startScheduler(db: Db, ctx: AdapterContext, cfg: Config): SchedulerHandle {
-  const taggingOn = llmTaggingReady(cfg);
-  const tagger = taggingOn ? makeAnthropicTagger(cfg) : null;
+export function startScheduler(db: Db, envCfg: Config): SchedulerHandle {
   let running = false;
   const tick = async (): Promise<void> => {
     if (running) return; // don't overlap ticks
     running = true;
     try {
+      const ctx = buildAdapterContext(effectiveConfig(db, envCfg));
       const summary = await pollDue(db, ctx);
       if (summary.processed > 0) log("scheduler").debug("tick", summary);
-      if (tagger && summary.created > 0) {
-        const t = await tagPending(db, tagger, { limit: 200 });
-        if (t.tagged > 0) log("scheduler").info("auto-tagged", t);
+      if (summary.created > 0) {
+        const t = await tagIfEnabled(db, envCfg);
+        if (t && t.tagged > 0) log("scheduler").info("auto-tagged", t);
       }
     } catch (err) {
       log("scheduler").error("tick failed", { err: (err as Error).message });
@@ -104,7 +109,7 @@ export function startScheduler(db: Db, ctx: AdapterContext, cfg: Config): Schedu
   };
   const job = new Cron("* * * * *", () => void tick());
   void tick(); // run once at startup
-  log("scheduler").info(`scheduler started (polling every minute; llm-tagging=${taggingOn})`);
+  log("scheduler").info("scheduler started (polling every minute)");
   return {
     stop(): void {
       job.stop();

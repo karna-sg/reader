@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		14F2E3D2F0B1571D6C08DC29 /* AdminViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87ED0EAD7FC1DD425828777 /* AdminViews.swift */; };
 		296ABF2D4E881D55018DB775 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AED67D88A45E041A1FA4D3D /* RootView.swift */; };
 		36697510DE24B91401D8473E /* OtherViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47FCE1DD7AD895773CC1FDD /* OtherViews.swift */; };
 		467594328DD36287FD406702 /* SDModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D162C94555DC9313D44330D /* SDModels.swift */; };
@@ -37,6 +38,7 @@
 		952EEB2BEF90ABE507E02BF3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		9E2E895582BE9713AC6B7271 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		B291AC4E167D7AABF0F1366F /* Format.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Format.swift; sourceTree = "<group>"; };
+		B87ED0EAD7FC1DD425828777 /* AdminViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminViews.swift; sourceTree = "<group>"; };
 		DBD5499FB4ADC7B640AD731D /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		E47FCE1DD7AD895773CC1FDD /* OtherViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OtherViews.swift; sourceTree = "<group>"; };
 		EC78EBA5D4D02903E4BD248A /* ReaderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderApp.swift; sourceTree = "<group>"; };
@@ -121,6 +123,7 @@
 		D58ED746EDAD4907315AFDEA /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				B87ED0EAD7FC1DD425828777 /* AdminViews.swift */,
 				3B5961A8B725B1357907B3CB /* LabelFeedView.swift */,
 				E47FCE1DD7AD895773CC1FDD /* OtherViews.swift */,
 				017A21D39D15FA6E71583303 /* ReaderView.swift */,
@@ -197,6 +200,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6FB89AC8DB7CAB46153A7FC5 /* APIClient.swift in Sources */,
+				14F2E3D2F0B1571D6C08DC29 /* AdminViews.swift in Sources */,
 				A4442B130E0F8790B2304AC7 /* AppConfig.swift in Sources */,
 				CBFAE514653A9C6C1C97217E /* AppModel.swift in Sources */,
 				BEF59E2B15CC8BAA97535B57 /* DTOs.swift in Sources */,

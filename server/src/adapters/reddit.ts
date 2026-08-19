@@ -34,6 +34,11 @@ interface RedditListing {
 // Module-level app-only token cache keyed by client id.
 const tokenCache = new Map<string, { token: string; expiresAt: number }>();
 
+/** Clear the cached OAuth token(s) — call when Reddit creds change at runtime. */
+export function clearRedditTokenCache(): void {
+  tokenCache.clear();
+}
+
 async function getAppToken(
   clientId: string,
   clientSecret: string,
