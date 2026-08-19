@@ -1,4 +1,4 @@
-# Reader — Personal iOS Knowledge Aggregator
+# Reader
 
 An RSS-first, self-hosted knowledge aggregator: a Node/TS backend fetches high-signal
 practitioner sources (blogs, Medium, Substack, Hacker News, Reddit, YouTube, arXiv,
