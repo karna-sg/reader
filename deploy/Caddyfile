@@ -1,0 +1,6 @@
+# Caddy terminates TLS (auto Let's Encrypt cert for READER_DOMAIN) and proxies
+# to the reader container. READER_DOMAIN is injected from the environment.
+{$READER_DOMAIN} {
+	encode gzip
+	reverse_proxy reader:8787
+}

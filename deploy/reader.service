@@ -1,0 +1,26 @@
+# Bare-metal (no Docker) alternative: run the built server as a systemd service.
+# Prereqs on the instance:
+#   - Node >= 22.19 (e.g. `curl -fsSL https://deb.nodesource.com/setup_22.x | sudo bash - && sudo apt install -y nodejs`)
+#   - Repo at /opt/reader/server, with `npm i -g pnpm@11.2.2 && pnpm install && pnpm build` run once
+#   - /opt/reader/server/.env created from env.example (DB_PATH=/opt/reader/data/reader.db)
+#   - Seeded once: `node dist/entry.mjs import-opml seeds/reader.opml && node dist/entry.mjs import-sources seeds/sources.json`
+# Install:  sudo cp reader.service /etc/systemd/system/ && sudo systemctl enable --now reader
+[Unit]
+Description=Reader knowledge-aggregator backend
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/reader/server
+EnvironmentFile=/opt/reader/server/.env
+ExecStart=/usr/bin/node dist/entry.mjs serve
+Restart=on-failure
+RestartSec=5
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

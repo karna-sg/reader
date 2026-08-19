@@ -1,0 +1,14 @@
+node_modules
+dist
+build
+data
+*.db
+*.db-shm
+*.db-wal
+.env
+.env.*
+test
+coverage
+.vitest-cache
+*.log
+.DS_Store

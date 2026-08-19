@@ -1,0 +1,13 @@
+node_modules/
+dist/
+coverage/
+*.log
+.DS_Store
+.vitest-cache/
+# runtime data + secrets
+*.db
+*.db-shm
+*.db-wal
+data/
+.env
+.env.local

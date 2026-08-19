@@ -1,0 +1,5 @@
+allowBuilds:
+  esbuild: true
+# Single-package project. pnpm 11 reads build-script and supply-chain settings here.
+onlyBuiltDependencies:
+  - esbuild

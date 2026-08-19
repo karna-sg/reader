@@ -1,0 +1,43 @@
+# Recommended: Reader behind Caddy with automatic HTTPS (needs a domain pointed
+# at the Lightsail instance's public IP). Copy env.example -> .env and set
+# READER_DOMAIN + READER_TOKEN (+ optional keys), then:  docker compose up -d
+services:
+  reader:
+    build: ../server
+    restart: unless-stopped
+    environment:
+      PORT: "8787"
+      DB_PATH: /data/reader.db
+      READER_TOKEN: ${READER_TOKEN:?set READER_TOKEN in .env}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      TAG_MODEL: ${TAG_MODEL:-claude-haiku-4-5}
+      TAG_LLM_ENABLED: ${TAG_LLM_ENABLED:-false}
+      REDDIT_CLIENT_ID: ${REDDIT_CLIENT_ID:-}
+      REDDIT_CLIENT_SECRET: ${REDDIT_CLIENT_SECRET:-}
+      REDDIT_USER_AGENT: ${REDDIT_USER_AGENT:-reader-personal/0.1}
+      HTTP_USER_AGENT: ${HTTP_USER_AGENT:-reader-personal/0.1 (+https://example.invalid/reader)}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    volumes:
+      - reader-data:/data
+    expose:
+      - "8787"
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - reader
+    environment:
+      READER_DOMAIN: ${READER_DOMAIN:?set READER_DOMAIN in .env}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  reader-data:
+  caddy-data:
+  caddy-config:

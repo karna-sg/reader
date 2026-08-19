@@ -1,0 +1,27 @@
+# No-domain variant: expose the API directly on port 8787 over HTTP (use the
+# instance's public IP). The iOS app allows this (ATS arbitrary loads). Open
+# port 8787 in the Lightsail networking firewall. Run:
+#   docker compose -f docker-compose.ip.yml up -d
+services:
+  reader:
+    build: ../server
+    restart: unless-stopped
+    environment:
+      PORT: "8787"
+      DB_PATH: /data/reader.db
+      READER_TOKEN: ${READER_TOKEN:?set READER_TOKEN in .env}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      TAG_MODEL: ${TAG_MODEL:-claude-haiku-4-5}
+      TAG_LLM_ENABLED: ${TAG_LLM_ENABLED:-false}
+      REDDIT_CLIENT_ID: ${REDDIT_CLIENT_ID:-}
+      REDDIT_CLIENT_SECRET: ${REDDIT_CLIENT_SECRET:-}
+      REDDIT_USER_AGENT: ${REDDIT_USER_AGENT:-reader-personal/0.1}
+      HTTP_USER_AGENT: ${HTTP_USER_AGENT:-reader-personal/0.1 (+https://example.invalid/reader)}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    volumes:
+      - reader-data:/data
+    ports:
+      - "8787:8787"
+
+volumes:
+  reader-data:

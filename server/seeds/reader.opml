@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0">
+  <head>
+    <title>Reader default subscriptions</title>
+  </head>
+  <body>
+    <outline text="Startup">
+      <outline type="rss" text="Lenny's Newsletter" xmlUrl="https://www.lennysnewsletter.com/feed" htmlUrl="https://www.lennysnewsletter.com"/>
+      <outline type="rss" text="Not Boring (Packy McCormick)" xmlUrl="https://www.notboring.co/feed" htmlUrl="https://www.notboring.co"/>
+      <outline type="rss" text="Stratechery" xmlUrl="https://stratechery.com/feed/" htmlUrl="https://stratechery.com"/>
+      <outline type="rss" text="Bits about Money (patio11)" xmlUrl="https://www.bitsaboutmoney.com/archive/rss/" htmlUrl="https://www.bitsaboutmoney.com"/>
+    </outline>
+
+    <outline text="Engineering">
+      <outline type="rss" text="Lobste.rs" xmlUrl="https://lobste.rs/rss" htmlUrl="https://lobste.rs"/>
+      <outline type="rss" text="Julia Evans" xmlUrl="https://jvns.ca/atom.xml" htmlUrl="https://jvns.ca"/>
+      <outline type="rss" text="Dan Luu" xmlUrl="https://danluu.com/atom.xml" htmlUrl="https://danluu.com"/>
+      <outline type="rss" text="Simon Willison" xmlUrl="https://simonwillison.net/atom/everything/" htmlUrl="https://simonwillison.net"/>
+      <outline type="rss" text="Martin Fowler" xmlUrl="https://martinfowler.com/feed.atom" htmlUrl="https://martinfowler.com"/>
+      <outline type="rss" text="Brendan Gregg" xmlUrl="https://www.brendangregg.com/blog/rss.xml" htmlUrl="https://www.brendangregg.com"/>
+      <outline type="rss" text="The Pragmatic Engineer" xmlUrl="https://newsletter.pragmaticengineer.com/feed" htmlUrl="https://newsletter.pragmaticengineer.com"/>
+      <outline type="rss" text="Cloudflare Blog" xmlUrl="https://blog.cloudflare.com/rss" htmlUrl="https://blog.cloudflare.com"/>
+      <outline type="rss" text="Netflix Tech Blog" xmlUrl="https://netflixtechblog.com/feed" htmlUrl="https://netflixtechblog.com"/>
+      <outline type="rss" text="GitHub Blog" xmlUrl="https://github.blog/feed/" htmlUrl="https://github.blog"/>
+      <outline type="rss" text="Stripe Blog" xmlUrl="https://stripe.com/blog/feed.rss" htmlUrl="https://stripe.com/blog"/>
+      <outline type="rss" text="Meta Engineering" xmlUrl="https://engineering.fb.com/feed/" htmlUrl="https://engineering.fb.com"/>
+    </outline>
+
+    <outline text="AI / ML">
+      <outline type="rss" text="OpenAI News" xmlUrl="https://openai.com/news/rss.xml" htmlUrl="https://openai.com/news"/>
+      <outline type="rss" text="Google Research" xmlUrl="https://research.google/blog/rss" htmlUrl="https://research.google/blog"/>
+      <outline type="rss" text="Import AI (Jack Clark)" xmlUrl="https://importai.substack.com/feed" htmlUrl="https://importai.substack.com"/>
+      <outline type="rss" text="Simon Willison" xmlUrl="https://simonwillison.net/atom/everything/" htmlUrl="https://simonwillison.net"/>
+    </outline>
+
+    <outline text="Product">
+      <outline type="rss" text="Lenny's Newsletter" xmlUrl="https://www.lennysnewsletter.com/feed" htmlUrl="https://www.lennysnewsletter.com"/>
+      <outline type="rss" text="Stratechery" xmlUrl="https://stratechery.com/feed/" htmlUrl="https://stratechery.com"/>
+    </outline>
+
+    <outline text="Design">
+      <outline type="rss" text="Figma Blog" xmlUrl="https://www.figma.com/blog/feed/atom.xml" htmlUrl="https://www.figma.com/blog"/>
+    </outline>
+
+    <outline text="Investing">
+      <outline type="rss" text="Bits about Money (patio11)" xmlUrl="https://www.bitsaboutmoney.com/archive/rss/" htmlUrl="https://www.bitsaboutmoney.com"/>
+    </outline>
+
+    <outline text="Career">
+      <outline type="rss" text="The Pragmatic Engineer" xmlUrl="https://newsletter.pragmaticengineer.com/feed" htmlUrl="https://newsletter.pragmaticengineer.com"/>
+    </outline>
+
+    <outline text="Science">
+      <outline type="rss" text="Quanta Magazine" xmlUrl="https://www.quantamagazine.org/feed/" htmlUrl="https://www.quantamagazine.org"/>
+    </outline>
+  </body>
+</opml>

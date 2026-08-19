@@ -1,0 +1,21 @@
+# Node
+node_modules/
+dist/
+coverage/
+*.log
+.vitest-cache/
+
+# Secrets + runtime data
+.env
+.env.local
+*.db
+*.db-shm
+*.db-wal
+server/data/
+
+# macOS / Xcode
+.DS_Store
+xcuserdata/
+*.xcuserstate
+build/
+DerivedData/

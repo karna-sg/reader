@@ -1,0 +1,47 @@
+name: Reader
+options:
+  bundleIdPrefix: com.reader
+  deploymentTarget:
+    iOS: "26.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    CODE_SIGNING_ALLOWED: "NO"
+    CODE_SIGNING_REQUIRED: "NO"
+    ENABLE_USER_SCRIPT_SANDBOXING: "YES"
+    GENERATE_INFOPLIST_FILE: "NO"
+
+targets:
+  Reader:
+    type: application
+    platform: iOS
+    sources:
+      - path: Reader
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.reader.personal
+        PRODUCT_NAME: Reader
+        TARGETED_DEVICE_FAMILY: "1"
+        MARKETING_VERSION: "0.1"
+        CURRENT_PROJECT_VERSION: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        INFOPLIST_KEY_UILaunchScreen_Generation: "YES"
+    info:
+      path: Reader/Info.plist
+      properties:
+        CFBundleDisplayName: Reader
+        CFBundleShortVersionString: "0.1"
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        NSAppTransportSecurity:
+          # Personal app: the user points it at their own server (local network,
+          # or a Lightsail box by IP/http or domain/https). Allow both.
+          NSAllowsLocalNetworking: true
+          NSAllowsArbitraryLoads: true
+        BGTaskSchedulerPermittedIdentifiers:
+          - com.reader.personal.refresh
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait

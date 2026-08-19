@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "warn"
+  },
+  "rules": {
+    "no-console": "off",
+    "eqeqeq": "error",
+    "no-else-return": "warn",
+    "prefer-const": "error",
+    "object-shorthand": "warn"
+  },
+  "ignorePatterns": ["dist", "node_modules"]
+}

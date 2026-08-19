@@ -1,0 +1,22 @@
+[
+  { "kind": "hackernews", "title": "Hacker News (front page)", "config": { "mode": "firebase-top", "limit": 30 }, "authority": 0.7, "label_ids": ["startup", "engineering"] },
+  { "kind": "hackernews", "title": "HN — AI/ML (100+ pts)", "config": { "mode": "algolia-search", "query": "AI OR LLM OR \"machine learning\"", "min_points": 100, "limit": 40 }, "authority": 0.6, "label_ids": ["ai-ml"] },
+
+  { "kind": "reddit", "title": "r/SaaS", "config": { "subreddit": "SaaS", "listing": "top", "timeframe": "day", "limit": 40 }, "authority": 0.6, "label_ids": ["startup"] },
+  { "kind": "reddit", "title": "r/startups", "config": { "subreddit": "startups", "listing": "top", "timeframe": "day", "limit": 40 }, "authority": 0.6, "label_ids": ["startup"] },
+  { "kind": "reddit", "title": "r/MachineLearning", "config": { "subreddit": "MachineLearning", "listing": "top", "timeframe": "day", "limit": 40 }, "authority": 0.7, "label_ids": ["ai-ml"] },
+  { "kind": "reddit", "title": "r/LocalLLaMA", "config": { "subreddit": "LocalLLaMA", "listing": "top", "timeframe": "day", "limit": 40 }, "authority": 0.6, "label_ids": ["ai-ml"] },
+  { "kind": "reddit", "title": "r/ExperiencedDevs", "config": { "subreddit": "ExperiencedDevs", "listing": "top", "timeframe": "week", "limit": 40 }, "authority": 0.6, "label_ids": ["engineering", "career"] },
+  { "kind": "reddit", "title": "r/ProductManagement", "config": { "subreddit": "ProductManagement", "listing": "top", "timeframe": "week", "limit": 40 }, "authority": 0.6, "label_ids": ["product"] },
+  { "kind": "reddit", "title": "r/Bogleheads", "config": { "subreddit": "Bogleheads", "listing": "top", "timeframe": "week", "limit": 40 }, "authority": 0.6, "label_ids": ["investing"] },
+
+  { "kind": "arxiv", "title": "arXiv cs.LG + cs.CL + cs.AI", "config": { "categories": ["cs.LG", "cs.CL", "cs.AI"] }, "authority": 0.6, "label_ids": ["ai-ml"] },
+  { "kind": "arxiv", "title": "arXiv q-bio (Quantitative Biology)", "config": { "categories": ["q-bio"] }, "authority": 0.5, "label_ids": ["science"] },
+
+  { "kind": "youtube", "title": "Fireship", "config": { "channel_id": "UCsBjURrPoezykLs9EqgamOA" }, "authority": 0.5, "label_ids": ["engineering"] },
+  { "kind": "youtube", "title": "Two Minute Papers", "config": { "channel_id": "UCbfYPyITQ-7l4upoX8nvctg" }, "authority": 0.5, "label_ids": ["ai-ml", "science"] },
+  { "kind": "youtube", "title": "3Blue1Brown", "config": { "channel_id": "UCYO_jab_esuFRV4b17AJtAw" }, "authority": 0.6, "label_ids": ["science"] },
+
+  { "kind": "github", "title": "ollama/ollama releases", "config": { "atom_url": "https://github.com/ollama/ollama/releases.atom" }, "authority": 0.5, "label_ids": ["ai-ml", "engineering"] },
+  { "kind": "github", "title": "vercel/next.js releases", "config": { "atom_url": "https://github.com/vercel/next.js/releases.atom" }, "authority": 0.5, "label_ids": ["engineering"] }
+]
